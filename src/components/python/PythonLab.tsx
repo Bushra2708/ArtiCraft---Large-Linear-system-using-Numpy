@@ -69,14 +69,14 @@ export const PythonLab: React.FC<PythonLabProps> = ({ A, b, solverMethod }) => {
   return (
     <div className="w-full flex flex-col gap-4">
       {/* Top Header Card */}
-      <div className="flex items-center justify-between px-5 py-3.5 rounded-2xl bg-white border border-[#E6E9EE] shadow-sm">
+      <div className="python-lab-header flex items-center justify-between px-5 py-3.5 rounded-2xl border shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#EBF7EF] border border-[#99D4AA] flex items-center justify-center text-[#276239]">
+          <div className="python-lab-icon w-9 h-9 rounded-xl border flex items-center justify-center">
             <Code2 size={18} />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-[#2D3136]">Python NumPy Script</h4>
-            <p className="text-xs text-[#7E8694]">Exact executable script reproducing your active system</p>
+            <h4 className="python-lab-title text-sm font-bold">Python NumPy Script</h4>
+            <p className="python-lab-muted text-xs">Exact executable script reproducing your active system</p>
           </div>
         </div>
         <div className="flex items-center gap-2">

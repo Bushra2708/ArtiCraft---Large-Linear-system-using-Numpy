@@ -4,7 +4,8 @@ import {
   BarChart3, Activity, CheckCircle2, AlertTriangle, Search,
   X, ArrowDown, GitCompare,
   Eye, Grid3X3, BookOpen, Cpu, Sun, Moon,
-  Sliders, ArrowUpRight, Sparkles, RefreshCw, ChevronDown, Check
+  Sliders, ArrowUpRight, Sparkles, RefreshCw, ChevronDown, Check,
+  PanelLeftClose, PanelLeftOpen, Menu
 } from 'lucide-react';
 import type { Matrix, Vector, SolverResult, SolverType, MatrixPreset, SystemConfig, MatrixMetrics, RowColStats } from './math/types';
 import { generateSystem } from './math/generators';
@@ -81,6 +82,9 @@ export default function App() {
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
   const [showConfigDrawer, setShowConfigDrawer] = useState(false);
   const [presetDropdownOpen, setPresetDropdownOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [systemConfigOpen, setSystemConfigOpen] = useState(true);
 
   const cmdInputRef = useRef<HTMLInputElement>(null);
   const presetDropdownRef = useRef<HTMLDivElement>(null);
@@ -126,7 +130,7 @@ export default function App() {
   }, [commandOpen]);
 
   // ─── Generate System ───
-  const handleGenerate = useCallback(() => {
+  const handleGenerate = useCallback((configOverride?: SystemConfig) => {
     setStatus('generating');
     setErrorMsg(null);
     setSolverResult(null);
@@ -160,7 +164,7 @@ export default function App() {
           setB(parsedB);
           setMetrics(computeMatrixMetrics(parsedA));
         } else {
-          const { A: genA, b: genB } = generateSystem(config);
+          const { A: genA, b: genB } = generateSystem(configOverride || config);
           setA(genA);
           setB(genB);
           setMetrics(computeMatrixMetrics(genA));
@@ -480,191 +484,65 @@ export default function App() {
       {/* Ambient Glow */}
       <div className="chic-bg"><div className="chic-bg-glow" /></div>
 
-      {/* ══════════════════════════════════════════════════════════════════
-          SINGLE UNIFIED CHIC NAVBAR (No second navbar! Sleek, all-in-one)
-      ══════════════════════════════════════════════════════════════════ */}
-      <header className="relative z-30 h-[58px] px-6 bg-[var(--bg-card)]/95 backdrop-blur-md border-b border-[var(--border-subtle)] flex items-center justify-between flex-shrink-0 shadow-sm">
-        {/* Brand & Preset Dropdown */}
-        <div className="flex items-center gap-5">
+      {/* Top header: brand and primary actions only */}
+      <header className="app-header relative z-30 px-6 bg-[var(--bg-card)]/95 backdrop-blur-md border-b border-[var(--border-subtle)] flex-shrink-0 shadow-sm">
+        <div className="app-brand flex items-center gap-3">
+          <button className="mobile-nav-trigger btn-icon" onClick={() => setMobileSidebarOpen(true)} title="Open navigation">
+            <Menu size={19} />
+          </button>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-[#68BA7F] flex items-center justify-center text-white shadow-sm flex-shrink-0">
-              <Cpu size={17} />
+            <div className="app-logo w-10 h-10 rounded-xl bg-[#68BA7F] flex items-center justify-center text-white shadow-sm flex-shrink-0">
+              <Cpu size={20} />
             </div>
             <div>
               <div className="flex items-center gap-1.5 leading-none">
-                <span className="font-extrabold text-[15px] tracking-tight text-[var(--text-main)]">LINEAR</span>
-                <span className="font-extrabold text-[15px] tracking-tight text-[#68BA7F]">LAB</span>
+                <span className="font-extrabold text-lg tracking-tight text-[var(--text-main)]">LINEAR</span>
+                <span className="font-extrabold text-lg tracking-tight text-[#68BA7F]">LAB</span>
               </div>
-              <span className="text-[10px] font-mono text-[var(--text-muted)] font-medium">
-                Ax = b · NumPy LAPACK
+              <span className="text-xs font-mono text-[var(--text-muted)] font-medium">
+                Ax = b · NumPy
               </span>
             </div>
           </div>
-
-          {/* Preset Selector Dropdown Button */}
-          <div className="relative" ref={presetDropdownRef}>
-            <button
-              onClick={() => setPresetDropdownOpen(o => !o)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-hover)] border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-main)] transition-colors shadow-sm"
-              title="Select Matrix Preset"
-            >
-              <span className="text-[#68BA7F]">{activePresetInfo.icon}</span>
-              <span>{activePresetInfo.label}</span>
-              <ChevronDown size={13} className="text-[var(--text-muted)]" />
-            </button>
-
-            {/* Presets Dropdown Menu */}
-            {presetDropdownOpen && (
-              <div className="absolute left-0 top-full mt-2 w-72 bg-[var(--bg-card)] border border-[var(--border-mid)] rounded-2xl shadow-2xl p-2 z-50 animate-fade-in">
-                <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                  Select Matrix Preset
-                </div>
-                <div className="max-h-80 overflow-y-auto flex flex-col gap-1">
-                  {PRESETS.map(p => (
-                    <button
-                      key={p.key}
-                      onClick={() => {
-                        setConfig(c => ({ ...c, preset: p.key }));
-                        setInputMode('generate');
-                        setPresetDropdownOpen(false);
-                        setTimeout(() => handleGenerate(), 20);
-                      }}
-                      className={`flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors ${
-                        config.preset === p.key && inputMode === 'generate'
-                          ? 'bg-[var(--c-sage-soft)] text-[#68BA7F] font-bold'
-                          : 'text-[var(--text-body)] hover:bg-[var(--bg-hover)]'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span className="p-1 rounded-lg bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)]">
-                          {p.icon}
-                        </span>
-                        <div>
-                          <div>{p.label}</div>
-                          <div className="text-[10px] font-normal text-[var(--text-muted)]">{p.desc}</div>
-                        </div>
-                      </div>
-                      {config.preset === p.key && inputMode === 'generate' && (
-                        <Check size={14} className="text-[#68BA7F]" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
         </div>
 
-        {/* Center: Primary Navigation Tabs */}
-        <nav className="chic-tab-container hidden md:inline-flex">
-          {([
-            ['system', 'Overview', <Grid3X3 size={13} />],
-            ['matrix', 'Matrix', <Eye size={13} />],
-            ['solver', 'Solution & Verification', <Play size={13} />],
-            ['analysis', 'Residual Analysis', <Activity size={13} />],
-            ['python', 'Python Lab', <Code2 size={13} />],
-            ['compare', 'Benchmark', <GitCompare size={13} />],
-          ] as [AppTab, string, React.ReactNode][]).map(([tab, label, icon]) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`chic-tab-btn ${activeTab === tab ? 'active' : ''}`}
-            >
-              <span className={activeTab === tab ? 'text-[#68BA7F]' : 'text-[var(--text-muted)]'}>{icon}</span>
-              {label}
-            </button>
-          ))}
-        </nav>
-
-        {/* Right: Quick Controls, Size Stepper, Solver, Solve CTA */}
-        <div className="flex items-center gap-2.5">
-          {/* Status Badge */}
-          <div className="chic-badge badge-mint hidden lg:inline-flex shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#68BA7F] animate-pulse" />
-            <span className="capitalize">{status === 'solved' ? 'Solved ✓' : status}</span>
-          </div>
-
-          {/* Matrix Dimension Stepper */}
-          <div className="flex items-center bg-[var(--bg-card-subtle)] rounded-xl border border-[var(--border-subtle)] px-1 py-0.5 text-xs font-mono font-bold">
-            <button
-              onClick={() => {
-                const nextSize = Math.max(2, config.size - 1);
-                setConfig(c => ({ ...c, size: nextSize, rows: nextSize, cols: nextSize }));
-                setTimeout(() => handleGenerate(), 20);
-              }}
-              className="px-1.5 py-0.5 hover:text-[#68BA7F] transition-colors"
-              title="Decrease Matrix Dimension"
-            >
-              -
-            </button>
-            <span className="px-2 text-[var(--text-main)]">{n}×{m}</span>
-            <button
-              onClick={() => {
-                const nextSize = Math.min(100, config.size + 1);
-                setConfig(c => ({ ...c, size: nextSize, rows: nextSize, cols: nextSize }));
-                setTimeout(() => handleGenerate(), 20);
-              }}
-              className="px-1.5 py-0.5 hover:text-[#68BA7F] transition-colors"
-              title="Increase Matrix Dimension"
-            >
-              +
-            </button>
-          </div>
-
-          {/* Quick Solver Dropdown */}
-          <select
-            value={solverMethod}
-            onChange={e => setSolverMethod(e.target.value as SolverType)}
-            className="text-xs font-semibold text-[var(--text-body)] bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] rounded-xl py-1.5 px-2.5 cursor-pointer outline-none"
-          >
-            {SOLVER_OPTIONS.map(s => (
-              <option key={s.key} value={s.key}>{s.label}</option>
-            ))}
-          </select>
-
-          {/* Primary Solve CTA */}
+        <div className="app-controls flex items-center gap-2.5">
           <button
             onClick={handleSolve}
             disabled={A.length === 0}
-            className="btn btn-primary text-xs py-1.5 px-3.5 shadow-sm"
+            className="btn btn-primary header-solve shadow-sm"
           >
-            <Play size={13} /> Solve
+            <Play size={17} /> Solve
           </button>
-
-          {/* Search Trigger */}
           <button
             onClick={() => { setCommandOpen(true); setCommandFilter(''); setCommandSelectedIndex(0); }}
-            className="btn-icon"
+            className="search-trigger btn-icon"
             title="Spotlight Search (Ctrl+K)"
           >
-            <Search size={15} />
+            <Search size={17} />
+            <span>Search</span>
+            <kbd>Ctrl K</kbd>
           </button>
-
-          {/* Theme Toggle Button */}
           <button
             onClick={() => setThemeMode(m => m === 'light' ? 'dark' : 'light')}
             className="btn-icon"
             title={`Switch to ${themeMode === 'light' ? 'Dark' : 'Light'} Mode`}
           >
-            {themeMode === 'light' ? <Moon size={15} /> : <Sun size={15} />}
+            {themeMode === 'light' ? <Moon size={17} /> : <Sun size={17} />}
           </button>
-
-          {/* Presentation Mode */}
           <button
             onClick={() => { setPresentationMode(true); setPresentationStep(0); }}
             className="btn-icon"
-            title="Presentation Slides"
+            title="Help and presentation slides"
           >
-            <BookOpen size={15} />
+            <BookOpen size={17} />
           </button>
-
-          {/* Settings / Config Drawer */}
           <button
             onClick={() => setShowConfigDrawer(o => !o)}
             className={`btn-icon ${showConfigDrawer ? 'border-[#68BA7F] text-[#68BA7F] bg-[var(--c-sage-soft)]' : ''}`}
             title="Matrix System Settings"
           >
-            <Sliders size={15} />
+            <Sliders size={17} />
           </button>
         </div>
       </header>
@@ -672,7 +550,54 @@ export default function App() {
       {/* ══════════════════════════════════════════════════════════════════
           MAIN STAGE & VIEWS (Clean, expansive viewport)
       ══════════════════════════════════════════════════════════════════ */}
-      <div className="relative z-10 flex-1 overflow-hidden flex flex-col">
+      <div className="app-body relative z-10 flex-1 overflow-hidden flex">
+        <aside className={`app-sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${mobileSidebarOpen ? 'mobile-open' : ''}`} aria-label="Primary navigation">
+          <div className="sidebar-heading">WORKSPACES</div>
+          <nav className="sidebar-nav">
+            {([
+              ['system', 'Overview', <Grid3X3 size={21} />],
+              ['matrix', 'Matrix', <Eye size={21} />],
+              ['solver', 'Solution & Verification', <Play size={21} />],
+              ['analysis', 'Residual Analysis', <Activity size={21} />],
+              ['python', 'Python Lab', <Code2 size={21} />],
+              ['compare', 'Benchmark', <GitCompare size={21} />],
+            ] as [AppTab, string, React.ReactNode][]).map(([tab, label, icon]) => (
+              <button key={tab} onClick={() => { setActiveTab(tab); setMobileSidebarOpen(false); }} className={`sidebar-nav-item ${activeTab === tab ? 'active' : ''}`} title={sidebarCollapsed ? label : undefined}>
+                <span>{icon}</span><span className="sidebar-label">{label}</span>
+              </button>
+            ))}
+          </nav>
+          <div className={`sidebar-config ${systemConfigOpen ? 'open' : ''}`}>
+            <button className="sidebar-section-toggle" onClick={() => setSystemConfigOpen(open => !open)} title="Toggle system configuration">
+              <Sliders size={17} /><span className="sidebar-label">System Configuration</span><ChevronDown size={15} className="sidebar-config-chevron" />
+            </button>
+            {systemConfigOpen && !sidebarCollapsed && (
+              <div className="sidebar-config-fields">
+                <div className="sidebar-field relative" ref={presetDropdownRef}>
+                  <span className="system-control-label">System</span>
+                  <button onClick={() => setPresetDropdownOpen(o => !o)} className="sidebar-select preset-trigger" title="Select Matrix Preset">
+                    <span className="text-[#68BA7F]">{activePresetInfo.icon}</span><span>{activePresetInfo.label}</span><ChevronDown size={14} className="ml-auto text-[var(--text-muted)]" />
+                  </button>
+                  {presetDropdownOpen && (
+                    <div className="preset-menu sidebar-preset-menu absolute left-0 bottom-full mb-2 w-72 bg-[var(--bg-card)] border border-[var(--border-mid)] rounded-2xl shadow-2xl p-2 z-50 animate-fade-in">
+                      <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Select Matrix Preset</div>
+                      <div className="max-h-80 overflow-y-auto flex flex-col gap-1">
+                        {PRESETS.map(p => <button key={p.key} onClick={() => { const nextConfig = { ...config, preset: p.key }; setConfig(nextConfig); setInputMode('generate'); setPresetDropdownOpen(false); setTimeout(() => handleGenerate(nextConfig), 20); }} className={`flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors ${config.preset === p.key && inputMode === 'generate' ? 'bg-[var(--c-sage-soft)] text-[#68BA7F] font-bold' : 'text-[var(--text-body)] hover:bg-[var(--bg-hover)]'}`}><div className="flex items-center gap-2.5"><span className="p-1 rounded-lg bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)]">{p.icon}</span><div><div>{p.label}</div><div className="text-[10px] font-normal text-[var(--text-muted)]">{p.desc}</div></div></div>{config.preset === p.key && inputMode === 'generate' && <Check size={14} className="text-[#68BA7F]" />}</button>)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="sidebar-field"><span className="system-control-label">Size</span><div className="sidebar-size-control"><button onClick={() => { const nextSize = Math.max(2, config.size - 1); const nextConfig = { ...config, size: nextSize, rows: nextSize, cols: nextSize }; setConfig(nextConfig); setTimeout(() => handleGenerate(nextConfig), 20); }} className="dimension-step" title="Decrease Matrix Dimension">−</button><span>{n}×{m}</span><button onClick={() => { const nextSize = Math.min(100, config.size + 1); const nextConfig = { ...config, size: nextSize, rows: nextSize, cols: nextSize }; setConfig(nextConfig); setTimeout(() => handleGenerate(nextConfig), 20); }} className="dimension-step" title="Increase Matrix Dimension">+</button></div></div>
+                <div className="sidebar-field"><label className="system-control-label" htmlFor="sidebar-solver-select">Solver</label><select id="sidebar-solver-select" value={solverMethod} onChange={e => setSolverMethod(e.target.value as SolverType)} className="sidebar-select text-xs font-semibold text-[var(--text-body)] bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] rounded-xl cursor-pointer outline-none">{SOLVER_OPTIONS.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}</select></div>
+                <div className="sidebar-field"><span className="system-control-label">Status</span><div className="sidebar-status chic-badge badge-mint"><span className="w-2 h-2 rounded-full bg-[#68BA7F] animate-pulse" /><span className="capitalize">{status === 'solved' ? 'Solved ✓' : status}</span></div></div>
+              </div>
+            )}
+          </div>
+          <button className="sidebar-collapse" onClick={() => setSidebarCollapsed(c => !c)} title={sidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'}>
+            {sidebarCollapsed ? <PanelLeftOpen size={19} /> : <PanelLeftClose size={19} />}<span className="sidebar-label">{sidebarCollapsed ? 'Expand' : 'Collapse'}</span>
+          </button>
+        </aside>
+        <main className="app-main relative z-10 flex-1 overflow-hidden flex flex-col">
         {/* Solving Micro-Animation Overlay */}
         {solveAnimation && (
           <div className="absolute inset-0 z-40 bg-[var(--bg-app)]/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
@@ -749,72 +674,65 @@ export default function App() {
               </div>
             )}
 
-            {/* Main Stage Grid: Matrix Heatmap on Left (60%) + Vector & Info on Right (40%) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1">
-              {/* Left Column: Heatmap Explorer */}
-              <div className="lg:col-span-7 chic-card p-5 flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-[#68BA7F]" />
-                    <h3 className="text-sm font-bold text-[var(--text-main)]">Matrix A Heatmap & Cell Inspector</h3>
+            <div className="overview-flow">
+              <section className="overview-matrix-card chic-card">
+                <div className="overview-card-header">
+                  <div>
+                    <span className="section-kicker">MATRIX A</span>
+                    <h3>Heatmap & Cell Inspector</h3>
+                    <p>Inspect entries, rows, and columns directly on the matrix.</p>
                   </div>
-                  <button
-                    onClick={() => setActiveTab('matrix')}
-                    className="text-xs text-[#68BA7F] hover:underline flex items-center gap-1 font-semibold"
-                  >
-                    Deep View <ArrowUpRight size={13} />
+                  <button onClick={() => setActiveTab('matrix')} className="btn btn-secondary overview-deep-view">
+                    Deep View <ArrowUpRight size={16} />
                   </button>
                 </div>
-                <div className="flex-1 min-h-[380px]">
+                <div className="matrix-canvas-frame">
                   <MatrixHeatmapCanvas matrix={A} onSelectRowCol={handleSelectRowCol} theme={themeMode} />
                 </div>
-              </div>
+              </section>
 
-              {/* Right Column: Vectors, Condition Gauge & Solution */}
-              <div className="lg:col-span-5 flex flex-col gap-4">
-                {/* Condition & Residual Mini Card */}
-                <div className="chic-card p-4 flex items-center justify-between gap-4">
+              <section className="overview-vector-card chic-card">
+                <div className="overview-card-header compact">
+                  <div>
+                    <span className="section-kicker section-kicker-peach">VECTOR b</span>
+                    <h3>Right-Hand Side</h3>
+                    <p>The input vector used to define <strong>Ax = b</strong>.</p>
+                  </div>
+                </div>
+                <VectorView vector={b} label="b" color="#FFA896" />
+              </section>
+
+              <div className="overview-support-grid">
+                <section className="condition-panel chic-card p-5 flex items-center justify-between gap-6">
                   <div className="flex-1">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Condition Number</span>
-                    <h4 className="text-base font-bold text-[var(--text-main)] mt-0.5">
+                    <span className="section-kicker">CONDITION NUMBER</span>
+                    <h3 className="text-xl font-bold text-[var(--text-main)] mt-1">
                       κ(A) = {metrics ? (metrics.conditionNumber > 1e6 ? metrics.conditionNumber.toExponential(2) : metrics.conditionNumber.toFixed(2)) : '1.0'}
-                    </h4>
-                    <p className="text-xs text-[var(--text-muted)] mt-1">
+                    </h3>
+                    <p className="text-sm text-[var(--text-muted)] mt-2">
                       {conditionLevel === 'excellent' ? 'Ideal conditioning: inversion is perfectly stable.' :
                        conditionLevel === 'good' ? 'Well-conditioned system: standard round-off bounds apply.' :
                        conditionLevel === 'moderate' ? 'Moderate condition: some sensitivity to perturbations.' :
                        'Ill-conditioned: matrix is near-singular! Expect precision loss.'}
                     </p>
                   </div>
-                  <div className="w-36 flex-shrink-0">
-                    <ConditionGauge />
-                  </div>
-                </div>
+                  <div className="w-36 flex-shrink-0"><ConditionGauge /></div>
+                </section>
 
-                {/* Vector b Card */}
-                <div className="chic-card p-4 flex-1">
-                  <VectorView vector={b} label="b (Right-Hand Side)" color="#FFA896" />
-                </div>
-
-                {/* Quick Solution Card if solved */}
-                {solverResult && (
-                  <div className="chic-card chic-card-mint p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 size={16} className="text-[#68BA7F]" />
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-[#68BA7F]">
-                          Solution Found in {solverResult.timeMs.toFixed(2)} ms
-                        </h4>
+                <section className="solution-status-card chic-card chic-card-mint p-5">
+                  {solverResult ? (
+                    <>
+                      <div className="solution-status-heading">
+                        <div><span className="section-kicker section-kicker-sage">SOLUTION</span><h3>Solution found</h3></div>
+                        <CheckCircle2 size={22} className="text-[#68BA7F]" />
                       </div>
-                      <span className="font-mono text-xs font-bold text-[#68BA7F]">
-                        ‖r‖₂={solverResult.residualNorm.toExponential(2)}
-                      </span>
-                    </div>
-                    <div className="text-xs font-mono text-[var(--text-body)] line-clamp-2">
-                      x = [{solverResult.x.slice(0, 4).map(v => v.toFixed(3)).join(', ')}{solverResult.x.length > 4 ? ', …' : ''}]
-                    </div>
-                  </div>
-                )}
+                      <div className="solution-status-metrics"><span>{solverResult.timeMs.toFixed(2)} ms</span><span>‖r‖₂ = {solverResult.residualNorm.toExponential(2)}</span></div>
+                      <div className="solution-preview">x = [{solverResult.x.slice(0, 5).map(v => v.toFixed(3)).join(', ')}{solverResult.x.length > 5 ? ', …' : ''}]</div>
+                    </>
+                  ) : (
+                    <div className="solution-empty"><span className="section-kicker section-kicker-sage">SOLUTION</span><h3>Ready to solve</h3><p>Run the selected solver to calculate x and verify the residual.</p></div>
+                  )}
+                </section>
               </div>
             </div>
 
@@ -850,7 +768,7 @@ export default function App() {
 
         {/* ─── TAB 2: MATRIX EXPLORER ─── */}
         {activeTab === 'matrix' && (
-          <div className="flex-1 overflow-hidden flex flex-col p-6 gap-4">
+          <div className="matrix-workspace flex-1 overflow-hidden flex flex-col p-6 gap-4">
             {/* View Selector & Metrics */}
             <div className="flex items-center justify-between px-5 py-3 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-subtle)] shadow-sm">
               <div className="flex items-center gap-3">
@@ -882,7 +800,7 @@ export default function App() {
             </div>
 
             {/* View Render Area */}
-            <div className="flex-1 min-h-[420px] chic-card p-4 overflow-hidden">
+            <div className="matrix-render-area flex-1 min-h-[420px] chic-card p-4 overflow-hidden">
               {matrixView === 'heatmap' && (
                 <MatrixHeatmapCanvas matrix={A} onSelectRowCol={handleSelectRowCol} theme={themeMode} />
               )}
@@ -918,7 +836,7 @@ export default function App() {
 
         {/* ─── TAB 3: SOLVER & VECTORS ─── */}
         {activeTab === 'solver' && (
-          <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
+          <div className="solver-workspace flex-1 overflow-y-auto p-6 flex flex-col gap-5">
             {/* Equation Math Header */}
             <div className="chic-card chic-card-mint p-5 text-center">
               <span className="text-xs font-bold uppercase tracking-widest text-[#68BA7F]">Linear Equation System</span>
@@ -981,7 +899,7 @@ export default function App() {
 
         {/* ─── TAB 4: RESIDUAL ANALYSIS ─── */}
         {activeTab === 'analysis' && (
-          <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
+          <div className="analysis-workspace flex-1 overflow-y-auto p-6 flex flex-col gap-5">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
               <div className="lg:col-span-5 chic-card p-5 flex flex-col gap-4">
                 <div className="flex items-center justify-between">
@@ -1035,14 +953,14 @@ export default function App() {
 
         {/* ─── TAB 5: PYTHON LAB ─── */}
         {activeTab === 'python' && (
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="python-workspace flex-1 overflow-y-auto p-6">
             <PythonLab A={A} b={b} solverMethod={solverMethod} />
           </div>
         )}
 
         {/* ─── TAB 6: COMPARE SOLVERS BENCHMARK ─── */}
         {activeTab === 'compare' && (
-          <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
+          <div className="benchmark-workspace flex-1 overflow-y-auto p-6 flex flex-col gap-5">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-base font-bold text-[var(--text-main)]">Solver Benchmark Comparison</h3>
@@ -1065,32 +983,32 @@ export default function App() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-3">
+              <div className="benchmark-grid grid grid-cols-1 gap-3">
                 {benchmarkResults.map(({ name, result }, idx) => {
                   const maxTime = Math.max(...benchmarkResults.map(r => r.result.timeMs), 0.01);
                   const timePct = Math.max(8, (result.timeMs / maxTime) * 100);
                   const isFastest = result.timeMs === Math.min(...benchmarkResults.map(r => r.result.timeMs));
 
                   return (
-                    <div key={idx} className="chic-card p-4 flex flex-col gap-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-sm font-bold text-[var(--text-main)]">{name}</h4>
+                    <div key={idx} className="benchmark-card chic-card p-4 flex flex-col gap-3">
+                      <div className="benchmark-card-header">
+                        <div className="benchmark-card-title">
+                          <h4 className="text-base font-bold text-[var(--text-main)]">{name}</h4>
                           {isFastest && (
-                            <span className="chic-badge badge-mint text-[10px]">Fastest ⚡</span>
+                            <span className="chic-badge badge-mint benchmark-badge">Fastest ⚡</span>
                           )}
                         </div>
-                        <div className="flex items-center gap-4 text-xs font-mono">
-                          <span className="text-[var(--text-muted)]">
-                            ‖r‖₂: <strong className="text-[#FFA896]">{result.residualNorm.toExponential(2)}</strong>
+                        <div className="benchmark-metrics">
+                          <span>
+                            <span className="benchmark-metric-label">Residual</span><strong className="text-[#FFA896]">{result.residualNorm.toExponential(2)}</strong>
                           </span>
-                          <span className="text-[var(--text-muted)]">
-                            Time: <strong className="text-[#68BA7F]">{result.timeMs.toFixed(3)} ms</strong>
+                          <span>
+                            <span className="benchmark-metric-label">Time</span><strong className="text-[#68BA7F]">{result.timeMs.toFixed(3)} ms</strong>
                           </span>
                         </div>
                       </div>
 
-                      <div className="w-full h-3 rounded-full bg-[var(--border-subtle)] overflow-hidden">
+                      <div className="benchmark-progress w-full h-3 rounded-full bg-[var(--border-subtle)] overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-500"
                           style={{
@@ -1106,6 +1024,7 @@ export default function App() {
             )}
           </div>
         )}
+        </main>
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
@@ -1231,13 +1150,13 @@ export default function App() {
       ══════════════════════════════════════════════════════════════════ */}
       {commandOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-start justify-center pt-20 px-4"
+          className="command-overlay fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-start justify-center pt-20 px-4"
           onClick={e => { if (e.target === e.currentTarget) setCommandOpen(false); }}
         >
-          <div className="w-full max-w-xl bg-[var(--bg-card)] border border-[var(--border-mid)] rounded-2xl shadow-2xl overflow-hidden animate-fade-in flex flex-col">
+          <div className="command-palette w-full max-w-xl bg-[var(--bg-card)] border border-[var(--border-mid)] rounded-2xl shadow-2xl overflow-hidden animate-fade-in flex flex-col">
             {/* Search Input */}
-            <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border-subtle)] bg-[var(--bg-card-subtle)]">
-              <Search size={18} className="text-[#68BA7F] flex-shrink-0" />
+            <div className="command-palette-search flex items-center gap-3 px-5 py-4 border-b border-[var(--border-subtle)] bg-[var(--bg-card-subtle)]">
+              <Search size={21} className="text-[#68BA7F] flex-shrink-0" />
               <input
                 ref={cmdInputRef}
                 value={commandFilter}
@@ -1247,15 +1166,15 @@ export default function App() {
                 }}
                 onKeyDown={handleKeyDownSearch}
                 placeholder="Search actions, views, matrix presets, or solvers…"
-                className="flex-1 border-none outline-none text-sm text-[var(--text-main)] bg-transparent font-medium"
+                className="command-search-input flex-1 border-none outline-none text-sm text-[var(--text-main)] bg-transparent font-medium"
               />
-              <span className="px-2 py-0.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-muted)]">
+              <span className="command-close-hint px-2 py-0.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-muted)]">
                 ESC to close
               </span>
             </div>
 
             {/* Results List */}
-            <div className="max-h-80 overflow-y-auto p-2 flex flex-col gap-1">
+            <div className="command-results max-h-80 overflow-y-auto p-2 flex flex-col gap-1">
               {flatFilteredCommands.map((cmd, idx) => {
                 const isSelected = idx === commandSelectedIndex;
                 return (
@@ -1266,20 +1185,20 @@ export default function App() {
                       setCommandOpen(false);
                     }}
                     onMouseEnter={() => setCommandSelectedIndex(idx)}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-xs font-semibold transition-all ${
+                    className={`command-result-row w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-xs font-semibold transition-all ${
                       isSelected
                         ? 'bg-[var(--c-sage-soft)] text-[#68BA7F] shadow-sm'
                         : 'text-[var(--text-body)] hover:bg-[var(--bg-hover)]'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="p-1 rounded-lg bg-[var(--bg-card)] border border-[var(--border-subtle)]">
+                      <span className="command-result-icon p-1 rounded-lg bg-[var(--bg-card)] border border-[var(--border-subtle)]">
                         {cmd.icon}
                       </span>
                       <span>{cmd.label}</span>
                     </div>
                     {cmd.shortcut && (
-                      <kbd className="px-1.5 py-0.5 rounded bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-muted)]">
+                      <kbd className="command-shortcut px-1.5 py-0.5 rounded bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-muted)]">
                         {cmd.shortcut}
                       </kbd>
                     )}
@@ -1295,7 +1214,7 @@ export default function App() {
             </div>
 
             {/* Footer */}
-            <div className="px-5 py-2.5 border-t border-[var(--border-subtle)] bg-[var(--bg-card-subtle)] text-[11px] text-[var(--text-muted)] flex items-center justify-between font-mono">
+            <div className="command-palette-footer px-5 py-2.5 border-t border-[var(--border-subtle)] bg-[var(--bg-card-subtle)] text-[11px] text-[var(--text-muted)] flex items-center justify-between font-mono">
               <div className="flex items-center gap-3">
                 <span>↑↓ navigate</span>
                 <span>↵ select</span>
