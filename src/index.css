@@ -1,0 +1,656 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ==========================================================================
+   CHIC PASTEL DESIGN SYSTEM
+   Palette:
+     Charcoal:     #4A4A4A
+     Silver:       #CBCBCB
+     Pastel Peach: #FFA896
+     Pastel Mint:  #CFFFDC
+     Pastel Sage:  #68BA7F
+     + Complementary pastels (Lavender #DCD6F7, Butter #FFF3CD, Sky #DDF0FD)
+   ========================================================================== */
+
+:root {
+  /* Requested Base Theme Colors */
+  --c-charcoal: #4A4A4A;
+  --c-charcoal-dark: #2A2D30;
+  --c-charcoal-deep: #1E2022;
+  --c-silver: #CBCBCB;
+  --c-silver-light: #E8EAEF;
+  --c-silver-subtle: #F1F3F6;
+  
+  --c-peach: #FFA896;
+  --c-peach-soft: #FFF0ED;
+  --c-peach-border: #FFCCBF;
+  --c-peach-dark: #DE6D55;
+  
+  --c-mint: #CFFFDC;
+  --c-mint-soft: #F2FCF5;
+  --c-mint-border: #A3EFC0;
+  --c-mint-dark: #2F7D4E;
+  
+  --c-sage: #68BA7F;
+  --c-sage-hover: #58A66D;
+  --c-sage-soft: #EBF7EF;
+  --c-sage-border: #99D4AA;
+  --c-sage-dark: #276239;
+
+  /* Auxiliary Pastels */
+  --c-lavender: #DCD6F7;
+  --c-lavender-soft: #F4F2FC;
+  --c-lavender-dark: #7158C7;
+  --c-lavender-border: #C4B9F0;
+
+  --c-butter: #FFF0C8;
+  --c-butter-soft: #FFF9E9;
+  --c-butter-dark: #A67812;
+  --c-butter-border: #F5DC94;
+
+  --c-sky: #D8EEFC;
+  --c-sky-soft: #F0F8FE;
+  --c-sky-dark: #297CB0;
+  --c-sky-border: #AFD8F7;
+
+  /* Surfaces & Canvas (Default: Chic Studio Light) */
+  --bg-app: #F5F7FA;
+  --bg-sidebar: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-card-glass: rgba(255, 255, 255, 0.9);
+  --bg-card-subtle: #F9FAFB;
+  --bg-hover: #F2F4F7;
+  --bg-active: #E8EDF2;
+  --bg-code: #25282B;
+
+  /* Typography */
+  --text-main: #2D3136;
+  --text-body: #4A4A4A;
+  --text-muted: #7E8694;
+  --text-faint: #A4ACB9;
+  --text-white: #FFFFFF;
+
+  /* Borders & Dividers */
+  --border-subtle: #E6E9EE;
+  --border-mid: #CBCBCB;
+  --border-focus: #68BA7F;
+  --border-highlight: rgba(104, 186, 127, 0.35);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(42, 45, 48, 0.04), 0 1px 2px rgba(42, 45, 48, 0.02);
+  --shadow-md: 0 4px 16px -2px rgba(42, 45, 48, 0.06), 0 2px 6px -1px rgba(42, 45, 48, 0.03);
+  --shadow-lg: 0 12px 32px -4px rgba(42, 45, 48, 0.09), 0 4px 12px -2px rgba(42, 45, 48, 0.04);
+  --shadow-sage: 0 4px 14px rgba(104, 186, 127, 0.3);
+  --shadow-peach: 0 4px 14px rgba(255, 168, 150, 0.3);
+
+  /* Fonts */
+  --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Layout dimensions */
+  --sidebar-w: 320px;
+  --header-h: 60px;
+}
+
+/* Chic Charcoal Slate Theme variant */
+[data-theme="dark"] {
+  --bg-app: #151719;
+  --bg-sidebar: #1C1F22;
+  --bg-card: #202428;
+  --bg-card-glass: rgba(32, 36, 40, 0.92);
+  --bg-card-subtle: #191B1E;
+  --bg-hover: #2A2F35;
+  --bg-active: #323840;
+  --bg-code: #131517;
+
+  --c-peach-soft: rgba(255, 168, 150, 0.12);
+  --c-peach-border: rgba(255, 168, 150, 0.28);
+  --c-peach-dark: #FFA896;
+
+  --c-mint-soft: rgba(207, 255, 220, 0.12);
+  --c-mint-border: rgba(207, 255, 220, 0.28);
+  --c-mint-dark: #CFFFDC;
+
+  --c-sage-soft: rgba(104, 186, 127, 0.15);
+  --c-sage-border: rgba(104, 186, 127, 0.35);
+  --c-sage-dark: #A2E2B4;
+
+  --c-lavender-soft: rgba(220, 214, 247, 0.12);
+  --c-lavender-border: rgba(220, 214, 247, 0.28);
+  --c-lavender-dark: #DCD6F7;
+
+  --c-butter-soft: rgba(255, 240, 200, 0.12);
+  --c-butter-border: rgba(255, 240, 200, 0.28);
+  --c-butter-dark: #FFF0C8;
+
+  --text-main: #F4F6F9;
+  --text-body: #D0D5DD;
+  --text-muted: #8F99A8;
+  --text-faint: #565E6B;
+
+  --border-subtle: #2C323A;
+  --border-mid: #434B56;
+  --border-focus: #68BA7F;
+  --border-highlight: rgba(104, 186, 127, 0.4);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 32px -4px rgba(0, 0, 0, 0.55);
+}
+
+/* ==========================================================================
+   RESET & BASE STYLES
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-app);
+  color: var(--text-body);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   CHIC AMBIENT BACKGROUND
+   ========================================================================== */
+.chic-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.chic-bg::before {
+  content: '';
+  position: absolute;
+  top: -15%;
+  right: -10%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(207, 255, 220, 0.55) 0%, rgba(207, 255, 220, 0) 70%);
+  filter: blur(80px);
+  opacity: 0.85;
+}
+
+.chic-bg::after {
+  content: '';
+  position: absolute;
+  bottom: -15%;
+  left: -10%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(circle, rgba(255, 168, 150, 0.35) 0%, rgba(255, 168, 150, 0) 70%);
+  filter: blur(90px);
+  opacity: 0.75;
+}
+
+.chic-bg-glow {
+  position: absolute;
+  top: 35%;
+  left: 40%;
+  width: 45%;
+  height: 45%;
+  background: radial-gradient(circle, rgba(220, 214, 247, 0.4) 0%, rgba(220, 214, 247, 0) 70%);
+  filter: blur(90px);
+  opacity: 0.6;
+}
+
+/* ==========================================================================
+   CHIC CARDS & SURFACES
+   ========================================================================== */
+.chic-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.chic-card:hover {
+  border-color: var(--border-mid);
+  box-shadow: var(--shadow-md);
+}
+
+.chic-card-glass {
+  background: var(--bg-card-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+}
+
+/* Pastel Card Accents */
+.chic-card-mint {
+  background: linear-gradient(145deg, var(--bg-card) 0%, var(--c-mint-soft) 100%);
+  border-color: var(--c-mint-border);
+}
+
+.chic-card-peach {
+  background: linear-gradient(145deg, var(--bg-card) 0%, var(--c-peach-soft) 100%);
+  border-color: var(--c-peach-border);
+}
+
+.chic-card-lavender {
+  background: linear-gradient(145deg, var(--bg-card) 0%, var(--c-lavender-soft) 100%);
+  border-color: var(--c-lavender-border);
+}
+
+.chic-card-butter {
+  background: linear-gradient(145deg, var(--bg-card) 0%, var(--c-butter-soft) 100%);
+  border-color: var(--c-butter-border);
+}
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  padding: 9px 16px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn-primary {
+  background: var(--c-sage);
+  color: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sage);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--c-sage-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(104, 186, 127, 0.4);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-peach {
+  background: var(--c-peach);
+  color: var(--c-charcoal-deep);
+  border: 1px solid var(--c-peach-border);
+  box-shadow: var(--shadow-peach);
+}
+
+.btn-peach:hover:not(:disabled) {
+  background: #FF9B87;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-body);
+  border: 1px solid var(--border-mid);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-main);
+  border-color: var(--c-charcoal);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-body);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-mid);
+  color: var(--text-main);
+}
+
+/* ==========================================================================
+   BADGES & PILLS
+   ========================================================================== */
+.chic-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.badge-mint {
+  background: var(--c-mint);
+  color: var(--c-mint-dark);
+  border: 1px solid var(--c-mint-border);
+}
+
+.badge-sage {
+  background: var(--c-sage-soft);
+  color: var(--c-sage-dark);
+  border: 1px solid var(--c-sage-border);
+}
+
+.badge-peach {
+  background: var(--c-peach-soft);
+  color: var(--c-peach-dark);
+  border: 1px solid var(--c-peach-border);
+}
+
+.badge-lavender {
+  background: var(--c-lavender-soft);
+  color: var(--c-lavender-dark);
+  border: 1px solid var(--c-lavender-border);
+}
+
+.badge-butter {
+  background: var(--c-butter-soft);
+  color: var(--c-butter-dark);
+  border: 1px solid var(--c-butter-border);
+}
+
+.badge-charcoal {
+  background: var(--c-silver-light);
+  color: var(--c-charcoal);
+  border: 1px solid var(--c-silver);
+}
+
+/* ==========================================================================
+   NAV PILLS & TABS
+   ========================================================================== */
+.chic-tab-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.chic-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.chic-tab-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-hover);
+}
+
+.chic-tab-btn.active {
+  background: var(--bg-card);
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ==========================================================================
+   PRESET PILL
+   ========================================================================== */
+.preset-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+  user-select: none;
+}
+
+.preset-card:hover {
+  border-color: var(--c-silver);
+  background: var(--bg-card-subtle);
+  transform: translateY(-1px);
+}
+
+.preset-card.active {
+  border-color: var(--c-sage);
+  background: var(--c-sage-soft);
+  box-shadow: 0 0 0 1px var(--c-sage);
+}
+
+.preset-card .preset-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--c-charcoal);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.preset-card.active .preset-icon-box {
+  background: var(--c-sage);
+  color: #FFFFFF;
+  border-color: var(--c-sage);
+}
+
+/* ==========================================================================
+   INPUTS & CONTROLS
+   ========================================================================== */
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  background: var(--bg-card);
+  border: 1px solid var(--border-mid);
+  border-radius: 10px;
+  padding: 8px 12px;
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--c-sage);
+  box-shadow: 0 0 0 3px rgba(104, 186, 127, 0.2);
+}
+
+/* Range Slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--c-silver-light);
+  outline: none;
+  border: none;
+  padding: 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--c-sage);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(104, 186, 127, 0.4);
+  border: 2px solid #FFFFFF;
+  transition: transform 0.15s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* ==========================================================================
+   STAT METRIC CARDS
+   ========================================================================== */
+.stat-pill-card {
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.stat-pill-card:hover {
+  border-color: var(--border-mid);
+  transform: translateY(-1px);
+}
+
+.stat-pill-card .stat-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.stat-pill-card .stat-value {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-main);
+}
+
+.stat-pill-card .stat-sub {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+/* ==========================================================================
+   CODE BLOCKS
+   ========================================================================== */
+.code-container {
+  background: var(--bg-code);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  color: #E2E8F0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.7;
+  overflow: hidden;
+}
+
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ==========================================================================
+   SCROLLBARS
+   ========================================================================== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--c-silver);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--c-charcoal);
+}
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes spin-chic {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-chic {
+  animation: spin-chic 0.9s linear infinite;
+}
